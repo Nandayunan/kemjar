@@ -4,6 +4,7 @@ include 'konfig.php';
 
 $cart_items = [];
 $secretKey = "MyVerySecretKey1234567890abcdef";
+$total_harga = 0; // Initialize total_harga
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -11,7 +12,7 @@ if (isset($_SESSION['user_id'])) {
     // Check if the database connection is valid
     if ($conn) {
         // Use a prepared statement to prevent SQL injection
-        $stmt = $conn->prepare("SELECT cart.id, cart.quantity, products.product, products.gambar, users.nama, users.iv_nama FROM cart JOIN products ON cart.product_id = products.id_product JOIN users ON cart.user_id = users.id_user WHERE cart.user_id = ?");
+        $stmt = $conn->prepare("SELECT cart.id, cart.quantity, products.product, products.gambar, users.nama, users.iv_nama, products.harga FROM cart JOIN products ON cart.product_id = products.id_product JOIN users ON cart.user_id = users.id_user WHERE cart.user_id = ?");
 
         if ($stmt) {
             $stmt->bind_param("i", $user_id);
@@ -116,6 +117,8 @@ function decryptAES256($ciphertext, $iv, $key)
                         <th>Gambar Produk</th>
                         <th>Nama Produk</th>
                         <th>Quantity</th>
+                        <th>Harga</th>
+                        <th>Total Harga</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -127,20 +130,32 @@ function decryptAES256($ciphertext, $iv, $key)
                                 <td><img src="img/<?= htmlspecialchars($row['gambar']) ?>" alt="Gambar Produk" style="width:60px;height:auto;"></td>
                                 <td><?= htmlspecialchars($row['product']) ?></td>
                                 <td><?= $row['quantity'] ?></td>
+                                <td>Rp<?= number_format($row['harga'], 0, ',', '.') ?></td>
+                                <td>Rp<?= number_format($row['quantity'] * $row['harga'], 0, ',', '.') ?></td>
                                 <td>
                                     <a href="remove_from_cart.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm">Hapus</a>
                                     <a href="edit_cart.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm ms-1">Edit</a>
                                 </td>
                             </tr>
+                            <?php $total_harga += $row['quantity'] * $row['harga']; // Calculate total_harga ?>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5">Keranjang kosong.</td>
+                            <td colspan="7">Keranjang kosong.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+
+        <!-- Display total price -->
+        <?php if (!empty($cart_items)): ?>
+            <div class="row">
+                <div class="col text-end">
+                    <h4>Total Harga Keseluruhan: Rp<?= number_format($total_harga, 0, ',', '.') ?></h4>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
