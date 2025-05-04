@@ -1,3 +1,19 @@
+<?php
+session_start();
+include 'konfig.php';
+
+// Debug: tampilkan session ID (untuk cek apakah sama dengan yang dari login)
+echo "Session ID: " . session_id() . "<br>";
+
+if (isset($_SESSION['user_id'])) {
+	echo "User ID: " . htmlspecialchars($_SESSION['user_id']) . "<br>";
+	echo "Nama: " . htmlspecialchars($_SESSION['nama']) . "<br>";
+	echo "Role: " . htmlspecialchars($_SESSION['role']) . "<br>";
+} else {
+	echo "No user is currently logged in.";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -85,11 +101,11 @@
 									<div class="qty">2</div>
 								</a>
 								<script>
-								// Ubah link wishlist header ke wishlist.php
-								document.addEventListener('DOMContentLoaded', function() {
-									var wishlistLink = document.querySelector('.header-ctn .fa-heart-o').parentElement;
-									if (wishlistLink) wishlistLink.setAttribute('href', 'wishlist.php');
-								});
+									// Ubah link wishlist header ke wishlist.php
+									document.addEventListener('DOMContentLoaded', function() {
+										var wishlistLink = document.querySelector('.header-ctn .fa-heart-o').parentElement;
+										if (wishlistLink) wishlistLink.setAttribute('href', 'wishlist.php');
+									});
 								</script>
 							</div>
 							<!-- /Wishlist -->
@@ -101,6 +117,7 @@
 									<span>Your Cart</span>
 									<div class="qty">3</div>
 								</a>
+
 								<div class="cart-dropdown">
 									<div class="cart-list">
 										<div class="product-widget">
@@ -129,13 +146,17 @@
 										<small>3 Item(s) selected</small>
 										<h5>SUBTOTAL: $2940.00</h5>
 									</div>
-<div class="cart-btns">
-	<a href="yourcart.php">View Cart</a>
-	<a href="#">Checkout <i class="fa fa-arrow-circle-right"></i></a>
-</div>
+									<div class="cart-btns">
+										<a href="yourcart.php">View Cart</a>
+										<a href="#">Checkout <i class="fa fa-arrow-circle-right"></i></a>
+									</div>
 								</div>
 							</div>
 							<!-- /Cart -->
+
+							<div class="header-logout">
+								<a href="logout.php" class="btn btn-danger text-white" style="margin-left: 200px;" style="margin-bottom: 200px;">Logout</a>
+							</div>
 
 							<!-- Menu Toogle -->
 							<div class="menu-toggle">
@@ -172,6 +193,9 @@
 					<li><a href="#">Smartphones</a></li>
 					<li><a href="#">Cameras</a></li>
 					<li><a href="#">Accessories</a></li>
+					<li class="nav-item">
+
+					</li>
 				</ul>
 				<!-- /NAV -->
 			</div>
@@ -263,49 +287,49 @@
 					<div class="row">
 						<div class="products-tabs">
 							<!-- tab -->
-<div id="tab1" class="tab-pane active">
-  <div class="products-slick" data-nav="#slick-nav-1">
-	<?php
-	include 'konfig.php';
-	$result = mysqli_query($conn, "SELECT * FROM products ORDER BY id_product DESC LIMIT 10");
-	while($row = mysqli_fetch_assoc($result)) {
-	?>
-	<div class="product">
-	  <div class="product-img">
-		<img src="img/<?php echo htmlspecialchars($row['gambar']); ?>" alt="">
-	  </div>
-	  <div class="product-body">
-		<p class="product-category">Produk</p>
-		<h3 class="product-name"><a href="#"><?php echo htmlspecialchars($row['product']); ?></a></h3>
-		<h4 class="product-price">Rp<?php echo number_format($row['harga'],0,',','.'); ?></h4>
-		<div class="product-rating">
-		  <i class="fa fa-star"></i>
-		  <i class="fa fa-star"></i>
-		  <i class="fa fa-star"></i>
-		  <i class="fa fa-star"></i>
-		  <i class="fa fa-star"></i>
-		</div>
-		<div class="product-btns">
-		  <form method="post" action="add_to_wishlist.php" style="display:inline;">
-			<input type="hidden" name="produk_id" value="<?php echo $row['id_product']; ?>">
-			<button type="submit" class="add-to-wishlist" style="background:none;border:none;padding:0;">
-			  <i class="fa fa-heart-o"></i>
-			</button>
-		  </form>
-		  <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-		  <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-		</div>
-	  </div>
-	  <div class="add-to-cart">
-		<form method="post" action="add_to_cart.php">
-		  <input type="hidden" name="produk_id" value="<?php echo $row['id_product']; ?>">
-		  <button type="submit" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-		</form>
-	  </div>
-	</div>
-	<?php } ?>
-  </div>
-  <div id="slick-nav-1" class="products-slick-nav"></div>
+							<div id="tab1" class="tab-pane active">
+								<div class="products-slick" data-nav="#slick-nav-1">
+									<?php
+									include 'konfig.php';
+									$result = mysqli_query($conn, "SELECT * FROM products ORDER BY id_product DESC LIMIT 10");
+									while ($row = mysqli_fetch_assoc($result)) {
+									?>
+										<div class="product">
+											<div class="product-img">
+												<img src="img/<?php echo htmlspecialchars($row['gambar']); ?>" alt="">
+											</div>
+											<div class="product-body">
+												<p class="product-category">Produk</p>
+												<h3 class="product-name"><a href="#"><?php echo htmlspecialchars($row['product']); ?></a></h3>
+												<h4 class="product-price">Rp<?php echo number_format($row['harga'], 0, ',', '.'); ?></h4>
+												<div class="product-rating">
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+												</div>
+												<div class="product-btns">
+													<form method="post" action="add_to_wishlist.php" style="display:inline;">
+														<input type="hidden" name="produk_id" value="<?php echo $row['id_product']; ?>">
+														<button type="submit" class="add-to-wishlist" style="background:none;border:none;padding:0;">
+															<i class="fa fa-heart-o"></i>
+														</button>
+													</form>
+													<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+													<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+												</div>
+											</div>
+											<div class="add-to-cart">
+												<form method="post" action="add_to_cart.php">
+													<input type="hidden" name="produk_id" value="<?php echo $row['id_product']; ?>">
+													<button type="submit" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+												</form>
+											</div>
+										</div>
+									<?php } ?>
+								</div>
+								<div id="slick-nav-1" class="products-slick-nav"></div>
 							</div>
 							<!-- /tab -->
 						</div>
@@ -949,7 +973,9 @@
 						<span class="copyright">
 							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 							Copyright &copy;
-							<script>document.write(new Date().getFullYear());</script> All rights reserved | This
+							<script>
+								document.write(new Date().getFullYear());
+							</script> All rights reserved | This
 							template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a
 								href="https://colorlib.com" target="_blank">Colorlib</a>
 							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->

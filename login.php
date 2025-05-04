@@ -1,4 +1,5 @@
 <?php
+
 include 'konfig.php';
 
 function decryptAES256($ciphertext, $iv, $key)
@@ -35,11 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if ($user) {
     if (password_verify($inputPassword, $user['password'])) {
-      $_SESSION['user_id'] = $user['id'];
+      $_SESSION['user_id'] = $user['id_user'];
       $_SESSION['role'] = $user['role'];
       $_SESSION['nama'] = decryptAES256($user['nama'], $user['iv_nama'], $secretKey);
 
-      echo "<script>alert('Login berhasil!'); window.location.href='index.php';</script>";
+      // Use PHP header for redirection instead of JavaScript
+      header('Location: index.php');
       exit;
     } else {
       echo "<script>alert('Password salah!');</script>";
