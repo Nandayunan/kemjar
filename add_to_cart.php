@@ -8,6 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $product_id = $_POST['product_id'];
         $quantity = $_POST['quantity'];
 
+        // Validate product_id and quantity
+        if (empty($product_id)) {
+            echo "<script>alert('Produk tidak valid.'); window.history.back();</script>";
+            exit;
+        }
+
+        // Set default quantity to 1 if not provided
+        if (empty($quantity)) {
+            $quantity = 1;
+        }
+
         // Check if the product is already in the cart
         $stmt = $conn->prepare("SELECT id FROM cart WHERE user_id = ? AND product_id = ?");
         $stmt->bind_param("ii", $user_id, $product_id);

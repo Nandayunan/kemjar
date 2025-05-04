@@ -322,7 +322,7 @@ if (isset($_SESSION['user_id'])) {
 											</div>
 											<div class="add-to-cart">
 												<form method="post" action="add_to_cart.php">
-													<input type="hidden" name="produk_id" value="<?php echo $row['id_product']; ?>">
+													<input type="hidden" name="product_id" value="<?php echo $row['id_product']; ?>">
 													<button type="submit" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
 												</form>
 											</div>
