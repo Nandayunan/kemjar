@@ -1,36 +1,45 @@
 <?php
-session_start();
-include 'konfig.php';  // Pastikan ini mengarah ke file koneksi database
+include 'konfig.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $email = $_POST['email'];
-  $password = $_POST['password'];
+function decryptAES256($ciphertext, $iv, $key)
+{
+  $cipher = "aes-256-cbc";
+  return openssl_decrypt($ciphertext, $cipher, $key, 0, $iv);
+}
 
-  // Cek koneksi ke database
-  if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+function findUserByEmail($inputEmail, $conn, $key)
+{
+  $stmt = $conn->prepare("SELECT * FROM users");
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  while ($row = $result->fetch_assoc()) {
+    $decryptedEmail = decryptAES256($row['email'], $row['iv_email'], $key);
+    if ($decryptedEmail === $inputEmail) {
+      return $row;
+    }
   }
 
-  // Query untuk mengambil data user berdasarkan email
-  $stmt = $conn->prepare("SELECT id_user, email, password, role FROM users WHERE email = ?");
-  $stmt->bind_param("s", $email);
-  $stmt->execute();
-  $stmt->store_result();
+  return null;
+}
 
-  // Jika email ditemukan
-  if ($stmt->num_rows > 0) {
-    $stmt->bind_result($id_user, $db_email, $db_password, $role);
-    $stmt->fetch();
+$secretKey = "MyVerySecretKey1234567890abcdef";
 
-    // Verifikasi password
-    if (password_verify($password, $db_password)) {
-      // Set session untuk pengguna yang berhasil login
-      $_SESSION['id_user'] = $id_user;
-      $_SESSION['email'] = $db_email;
-      $_SESSION['role'] = $role;
+session_start();
 
-      // Redirect ke index.php jika login berhasil
-      header("Location: index.php");
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $inputEmail = $_POST['email'];
+  $inputPassword = $_POST['password'];
+
+  $user = findUserByEmail($inputEmail, $conn, $secretKey);
+
+  if ($user) {
+    if (password_verify($inputPassword, $user['password'])) {
+      $_SESSION['user_id'] = $user['id'];
+      $_SESSION['role'] = $user['role'];
+      $_SESSION['nama'] = decryptAES256($user['nama'], $user['iv_nama'], $secretKey);
+
+      echo "<script>alert('Login berhasil!'); window.location.href='index.php';</script>";
       exit;
     } else {
       echo "<script>alert('Password salah!');</script>";
@@ -38,10 +47,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } else {
     echo "<script>alert('Email tidak terdaftar!');</script>";
   }
-
-  $stmt->close();
 }
 ?>
+
+
 
 <!doctype html>
 <html lang="en">
@@ -65,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <img src="nimages/undraw_remotely_2j6y.svg" alt="Image" class="img-fluid">
+          <img src="img/undraw_remotely_2j6y.svg" alt="Image" class="img-fluid">
         </div>
         <div class="col-md-6 contents">
           <div class="row justify-content-center">

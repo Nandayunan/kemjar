@@ -1,24 +1,53 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-include 'konfig.php';
+include 'konfig.php'; // File koneksi database
+
+// Fungsi enkripsi AES-256 yang memisahkan IV
+function encryptAES256($data, $key)
+{
+  $cipher = "aes-256-cbc";
+  $ivlen = openssl_cipher_iv_length($cipher);
+  $iv = openssl_random_pseudo_bytes($ivlen);
+  $ciphertext = openssl_encrypt($data, $cipher, $key, 0, $iv);
+  return ['iv' => $iv, 'ciphertext' => $ciphertext];
+}
+
+$secretKey = "MyVerySecretKey1234567890abcdef";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $nama = $_POST['nama'];
-  $ttl = $_POST['ttl'];
-  $no_hp = $_POST['nomor'];
-  $alamat = $_POST['alamat'];
-  $email = $_POST['email'];
+  // Enkripsi tiap data
+  $enc_nama   = encryptAES256($_POST['nama'], $secretKey);
+  $enc_ttl    = encryptAES256($_POST['ttl'], $secretKey);
+  $enc_no_hp  = encryptAES256($_POST['nomor'], $secretKey);
+  $enc_alamat = encryptAES256($_POST['alamat'], $secretKey);
+  $enc_email  = encryptAES256($_POST['email'], $secretKey);
+
   $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
   $role = isset($_POST['role']) ? intval($_POST['role']) : 1;
 
-  // Cek koneksi
   if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
   }
 
-  $stmt = $conn->prepare("INSERT INTO users (nama, ttl, no_hp, alamat, email, password, role) VALUES (?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("ssssssi", $nama, $ttl, $no_hp, $alamat, $email, $password, $role);
+  // Tambahkan kolom IV saat menyimpan ke database
+  $stmt = $conn->prepare("INSERT INTO users 
+        (nama, iv_nama, ttl, iv_ttl, no_hp, iv_no_hp, alamat, iv_alamat, email, iv_email, password, role)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+  $stmt->bind_param(
+    "sssssssssssi",
+    $enc_nama['ciphertext'],
+    $enc_nama['iv'],
+    $enc_ttl['ciphertext'],
+    $enc_ttl['iv'],
+    $enc_no_hp['ciphertext'],
+    $enc_no_hp['iv'],
+    $enc_alamat['ciphertext'],
+    $enc_alamat['iv'],
+    $enc_email['ciphertext'],
+    $enc_email['iv'],
+    $password,
+    $role
+  );
 
   if ($stmt->execute()) {
     echo "<script>alert('Registrasi berhasil!'); window.location.href='login.php';</script>";
@@ -28,8 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   $stmt->close();
+  $conn->close();
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -51,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <img src="nimages/undraw_remotely_2j6y.svg" alt="Image" class="img-fluid">
+          <img src="img/undraw_remotely_2j6y.svg" alt="Image" class="img-fluid">
         </div>
         <div class="col-md-6 contents">
           <div class="row justify-content-center">
