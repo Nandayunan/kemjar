@@ -97,6 +97,15 @@ function decryptAES256($ciphertext, $iv, $key)
                     <li class="nav-item">
                         <a class="nav-link active" href="#">Your Cart</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user"></i> Profil
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -107,6 +116,9 @@ function decryptAES256($ciphertext, $iv, $key)
         <h2 class="text-center cart-header">Your Cart</h2>
         <div class="text-end mb-3">
             <a href="index.php" class="btn btn-secondary">← Kembali ke Produk</a>
+            <form method="post" action="checkout.php" style="display: inline;">
+                <button type="submit" class="btn btn-success">Checkout</button>
+            </form>
         </div>
 
         <div class="table-responsive">

@@ -154,9 +154,19 @@ if (isset($_SESSION['user_id'])) {
 							</div>
 							<!-- /Cart -->
 
-							<div class="header-logout">
-								<a href="logout.php" class="btn btn-danger text-white" style="margin-left: 200px;" style="margin-bottom: 200px;">Logout</a>
+							<!-- Profile Dropdown -->
+							<div class="dropdown" style="float: right; margin-left: 10px;">
+								<a class="dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									<i class="fa fa-user me-2"></i>
+									<span><?= htmlspecialchars($_SESSION['nama'] ?? 'Profil') ?></span>
+								</a>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+									<li><a class="dropdown-item" href="profile.php">Akun</a></li>
+									<li><a class="dropdown-item" href="history.php">History</a></li>
+									<li><a class="dropdown-item" href="logout.php">Logout</a></li>
+								</ul>
 							</div>
+							<!-- /Profile Dropdown -->
 
 							<!-- Menu Toogle -->
 							<div class="menu-toggle">
@@ -997,6 +1007,8 @@ if (isset($_SESSION['user_id'])) {
 	<script src="js/nouislider.min.js"></script>
 	<script src="js/jquery.zoom.min.js"></script>
 	<script src="js/main.js"></script>
+	<!-- Pastikan Bootstrap JavaScript dimuat -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
